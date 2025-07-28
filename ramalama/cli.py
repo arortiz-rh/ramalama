@@ -983,14 +983,17 @@ def run_cli(args):
 
     try:
         model = New(args.MODEL, args)
+        model.ensure_model_exists(args)
         model.serve(args, quiet=True) if args.rag else model.run(args)
 
     except KeyError as e:
         logger.debug(e)
         try:
             args.quiet = True
-            model = ModelFactory(args.MODEL, args, ignore_stderr=True).create_oci()
-            model.serve(args) if args.rag else model.run(args)
+            oci_model = ModelFactory(args.MODEL, args, ignore_stderr=True).create_oci()
+            oci_model.ensure_model_exists(args)
+
+            oci_model.serve(args) if args.rag else oci_model.run(args)
         except Exception:
             raise e
 
